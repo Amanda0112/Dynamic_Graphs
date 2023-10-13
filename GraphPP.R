@@ -22,7 +22,7 @@ p<- fert%>%
        color = 'Continent',size = "Population (millions)") + 
   ylim(30,100) +
   geom_point()
-  ggplotly(p)
+ggplotly(p)
 
 #Dynamic graph---------------------
 #install.packages("plotly")
@@ -43,6 +43,10 @@ ggplotly(p)
 library(gganimate)
 library(gifski)
 
+temp_file_proc <- tempfile(pattern = "", fileext = ".png")
+
+outout_file_proc <- paste("C:/Users/amand/OneDrive/Escritorio/Data_Viz", Sys.getenv("USERNAME"), "_DynamicGraphs.pptx", sep = "")
+
 p1 <- ggplot(fert, aes(fert, life, size = pop, color = continent, frame = year)) +
   labs(x="Fertility Rate", y = "Life expectancy at birth (years)", 
        caption = "(Based on data from Hans Rosling - gapminder.com)", 
@@ -55,26 +59,10 @@ p1 <- ggplot(fert, aes(fert, life, size = pop, color = continent, frame = year))
   enter_fade() +
   exit_fade()
 
-animate(p1,fps = 4, width = 600, height = 400, renderer = gifski_renderer())
-
-animate(p1,nframes = 4, width = 700, height = 500, renderer = gifski_renderer())
-
-
-#Exporting ploty graphs to powerpoint---------------
-
-library(officer)
-library(magrittr)
-library(plotly)
-library(htmlwidgets)
-library(webshot)
-
-temp_file_proc <- tempfile(pattern = "", fileext = ".png")
-outout_file_proc <- paste("C:\", Sys.getenv("USERNAME"), "_ ".pptx", sep = "")
-
-df <- mtcars
-x <- plot_ly() %>% add_markers(data=mtcars, x=~wt, y=~disp)
-
+x <- animate(p1,fps = 4, width = 600, height = 400, renderer = gifski_renderer())
 saveWidget(x, "temp.html")
+
+#webshot::install_phantomjs()
 webshot("temp.html", temp_file_proc)
 
 doc <- read_pptx()
@@ -85,5 +73,3 @@ doc <- ph_with(x = doc, image_add,
                location = ph_location(left = 2.5, top = 2), use_loc_size = FALSE)
 
 print(doc, target = outout_file_proc)
-
-
